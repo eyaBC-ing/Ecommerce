@@ -1,0 +1,21 @@
+# Java
+projetreactback/target/
+projetreactback/.idea/
+projetreactback/*.iml
+projetreactback/.mvn/wrapper/maven-wrapper.jar
+
+# Node / React
+projetreactfront/node_modules/
+projetreactfront/dist/
+projetreactfront/.env
+projetreactfront/.vscode/
+
+# Temp / Fix files
+mysql-init.txt
+fix_mysql_password.bat
+.gemini/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
