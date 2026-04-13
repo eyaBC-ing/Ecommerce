@@ -4,13 +4,15 @@ import { Plus, Edit2, Trash2, X } from 'lucide-react';
 
 const API_PRODUCTS_URL = 'http://localhost:8080/api/products';
 const API_CATEGORIES_URL = 'http://localhost:8080/api/categories';
+const API_SUPPLIERS_URL = 'http://localhost:8080/api/suppliers';
 
 export default function ProductsAdmin() {
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [suppliers, setSuppliers] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const initialProductState = { id: null, name: '', description: '', price: 0, category: { id: '' } };
+    const initialProductState = { id: null, name: '', description: '', price: 0, category: { id: '' }, supplier: { id: '' } };
     const [currentProduct, setCurrentProduct] = useState(initialProductState);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -21,12 +23,14 @@ export default function ProductsAdmin() {
     const fetchData = async () => {
         try {
             setIsLoading(true);
-            const [productsRes, categoriesRes] = await Promise.all([
+            const [productsRes, categoriesRes, suppliersRes] = await Promise.all([
                 axios.get(API_PRODUCTS_URL),
-                axios.get(API_CATEGORIES_URL)
+                axios.get(API_CATEGORIES_URL),
+                axios.get(API_SUPPLIERS_URL)
             ]);
             setProducts(productsRes.data);
             setCategories(categoriesRes.data);
+            setSuppliers(suppliersRes.data);
         } catch (error) {
             console.error("Erreur de chargement", error);
         } finally {
@@ -36,10 +40,11 @@ export default function ProductsAdmin() {
 
     const openModal = (product = null) => {
         if (product) {
-            // Ensure category object exists for safety
+            // Ensure category and supplier object exists for safety
             setCurrentProduct({
                 ...product,
-                category: product.category || { id: '' }
+                category: product.category || { id: '' },
+                supplier: product.supplier || { id: '' }
             });
         } else {
             setCurrentProduct(initialProductState);
@@ -64,7 +69,8 @@ export default function ProductsAdmin() {
             const payload = {
                 ...currentProduct,
                 price: parseFloat(currentProduct.price),
-                category: { id: parseInt(currentProduct.category.id) }
+                category: { id: parseInt(currentProduct.category.id) },
+                supplier: currentProduct.supplier && currentProduct.supplier.id ? { id: parseInt(currentProduct.supplier.id) } : null
             };
 
             if (currentProduct.id) {
@@ -113,6 +119,7 @@ export default function ProductsAdmin() {
                                     <th>Produit</th>
                                     <th>Description</th>
                                     <th>Catégorie</th>
+                                    <th>Fournisseur</th>
                                     <th>Prix</th>
                                     <th style={{ textAlign: 'right' }}>Actions</th>
                                 </tr>
@@ -131,6 +138,11 @@ export default function ProductsAdmin() {
                                             <td>
                                                 <span className="badge">
                                                     {product.category ? product.category.name : 'Aucune'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span className="badge" style={{ backgroundColor: '#e2e8f0', color: '#475569' }}>
+                                                    {product.supplier ? product.supplier.name : 'Aucun'}
                                                 </span>
                                             </td>
                                             <td style={{ fontWeight: 600 }}>{product.price} €</td>
@@ -213,6 +225,23 @@ export default function ProductsAdmin() {
                                             <option value="" disabled>Sélectionner...</option>
                                             {categories.map(c => (
                                                 <option key={c.id} value={c.id}>{c.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Fournisseur</label>
+                                        <select
+                                            className="form-control"
+                                            value={currentProduct.supplier?.id || ''}
+                                            onChange={(e) => setCurrentProduct({
+                                                ...currentProduct,
+                                                supplier: { id: e.target.value }
+                                            })}
+                                        >
+                                            <option value="">Aucun</option>
+                                            {suppliers.map(s => (
+                                                <option key={s.id} value={s.id}>{s.name}</option>
                                             ))}
                                         </select>
                                     </div>

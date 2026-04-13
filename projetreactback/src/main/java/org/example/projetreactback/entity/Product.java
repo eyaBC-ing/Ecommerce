@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -23,4 +24,13 @@ public class Product {
     @JoinColumn(name = "category_id", nullable = false)
     @JsonIgnoreProperties("products")
     private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "supplier_id")
+    @JsonIgnoreProperties("products")
+    private Supplier supplier;
+
+    @ManyToMany(mappedBy = "products")
+    @JsonIgnoreProperties("products")
+    private List<LigneCommande> ligneCommandes;
 }
